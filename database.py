@@ -32,10 +32,8 @@ def generate_sql_tables(overwrite=False):
         table_name = os.path.basename(filename).replace(".sas7bdat", "")
 
         # Check if table name already exists and we don't want to overwrite
-        # if table_name in tables_already_created and not overwrite:
-        #     continue
-
-        df = pd.DataFrame()
+        if table_name in tables_already_created and not overwrite:
+            continue
 
         # Read data in chunks of 10,000
         reader: ReaderBase = pd.read_sas(filename, chunksize=10_000)
