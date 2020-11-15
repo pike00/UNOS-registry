@@ -29,9 +29,11 @@ def get_rows_by_year(year=2010):
 
         df = pd.read_sql_query(query, sqlite_connection)
 
-        new_filename = filename.replace("data_sas", "out")
+        new_filename = filename.replace("data_sas", "out").replace("sas7bdat","csv")
         os.makedirs(os.path.dirname(new_filename), exist_ok=True)
-        df.to_csv(new_filename)
+        df.to_csv(new_filename, header=True)
+
+        exit()
 
 
 if __name__ == "__main__":
