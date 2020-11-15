@@ -22,7 +22,7 @@ def generate_sql_tables(overwrite=False):
         r'data_sas/Deceased Donor/deceased_donor_data.sas7bdat',
         r'data_sas/Kidney_ Pancreas_ Kidney-Pancreas/Post-Transplant Malignancy/kidney_malig_followup_data.sas7bdat',
         r'data_sas/Kidney_ Pancreas_ Kidney-Pancreas/Immunosuppression/kidpan_immuno_discharge_data.sas7bdat',
-        r'data_sas/Kidney_ Pancreas_ Kidney-Pancreas/Immunosuppression/kidpan_immuno_followup_data.sas7bdat'
+        r'data_sas/Kidney_ Pancreas_ Kidney-Pancreas/Immunosuppression/kidpan_immuno_followup_data.sas7bdat',
         r'data_sas/Kidney_ Pancreas_ Kidney-Pancreas/Individual Follow-up Records/kidney_followup_data.sas7bdat',
         r'data_sas/Kidney_ Pancreas_ Kidney-Pancreas/Individual Follow-up Records/kidpan_followup_data.sas7bdat'
     ]
@@ -36,13 +36,17 @@ def generate_sql_tables(overwrite=False):
             continue
 
         # Read data in chunks of 10,000
-        reader: ReaderBase = pd.read_sas(filename, chunksize=10_000)
+        # reader = pd.read_sas(filename, chunksize=10_000, encoding="utf-")
+        reader = pd.read_sas(filename, chunksize=10_000)
         chunk_no = 0
 
         # noinspection PyTypeChecker
         for chunk in reader:
             # Adds number of rows in current chunk to the total count
             chunk_no += chunk.shape[0]
+            for col in chunk:
+                if chunk[col].dtype == "object":
+                    chunk[col] = chunk[col].str.decode("utf-8", errors="replace")
             chunk.to_sql(table_name, sqlite_connection, if_exists='append')
             print(f"Wrote {chunk_no} entries for {table_name}")
 
